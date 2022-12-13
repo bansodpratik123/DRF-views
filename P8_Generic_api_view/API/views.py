@@ -1,0 +1,523 @@
+from django.db.models.query import QuerySet
+from django.shortcuts import render
+from rest_framework import serializers
+from rest_framework.response import Response
+from .models import Employee
+from .serializers import EmployeeSerializer
+from rest_framework.renderers import JSONRenderer
+from django.http import HttpResponse
+
+import io
+from rest_framework.parsers import JSONParser
+import json
+from django.views.decorators.csrf import csrf_exempt
+
+# Create your views here.
+
+## Finction Based View
+# @csrf_exempt
+# def employee(request):
+#     if request.method=='GET':
+#         jsondata=request.body
+#         stream=io.BytesIO(jsondata)
+#         parseddata=JSONParser().parse(stream)
+#         id=parseddata.get('id', None)
+#         if id is not None:
+#             emp=Employee.objects.get(id=id)
+#             serializer=EmployeeSerializer(emp)
+#             print(serializer.data)
+#             # jsondata=JSONRenderer().render(serializer.data)
+#             # OR
+#             jsondata=json.dumps(serializer.data)
+#             return HttpResponse(jsondata, content_type='application/json')
+
+#         emp=Employee.objects.all()
+#         serializer=EmployeeSerializer(emp, many=True)
+#         jsondata=JSONRenderer().render(serializer.data)
+#         return HttpResponse(jsondata, content_type='application/json')
+
+#     if request.method=='POST':
+#         jsondata=request.body
+#         stream=io.BytesIO(jsondata)
+#         parseddata=JSONParser().parse(stream)
+#         serializer=EmployeeSerializer(data=parseddata)
+#         if serializer.is_valid():
+#             serializer.save()
+#             respo={'res':'Data created sccessfully'}
+#             jsonrespo=json.dumps(respo)
+#             return HttpResponse(jsonrespo, content_type='application/json')
+#         jsonrespo=json.dumps(serializer.errors)
+#         return HttpResponse(jsonrespo, content_type='application/json')
+
+#     if request.method=='PUT':
+#         jsondata=request.body
+#         stream=io.BytesIO(jsondata)
+#         parseddata=JSONParser().parse(stream)
+#         id=parseddata.get('id', None)
+#         emp=Employee.objects.get(id=id)
+#         serializer=EmployeeSerializer(emp, data=parseddata)
+#         if serializer.is_valid():
+#             serializer.save()
+#             respo={'res':'Complete data updated sccessfully'}
+#             jsonrespo=json.dumps(respo)
+#             return HttpResponse(jsonrespo, content_type='application/json')
+#         jsonrespo=json.dumps(serializer.errors)
+#         return HttpResponse(jsonrespo, content_type='application/json')
+
+
+#     if request.method=='PATCH':
+#         jsondata=request.body
+#         stream=io.BytesIO(jsondata)
+#         parseddata=JSONParser().parse(stream)
+#         id=parseddata.get('id', None)
+#         emp=Employee.objects.get(id=id)
+#         serializer=EmployeeSerializer(emp, data=parseddata, partial=True)
+#         if serializer.is_valid():
+#             serializer.save()
+#             respo={'res':'partial data updated sccessfully'}
+#             jsonrespo=json.dumps(respo)
+#             return HttpResponse(jsonrespo, content_type='application/json')
+#         jsonrespo=json.dumps(serializer.errors)
+#         return HttpResponse(jsonrespo, content_type='application/json')
+
+    
+#     if request.method=='DELETE':
+#         jsondata=request.body
+#         stream=io.BytesIO(jsondata)
+#         parseddata=JSONParser().parse(stream)
+#         id=parseddata.get('id', None)
+
+#         if id is not None:
+#             stu=Employee.objects.get(id=id)
+#             stu.delete()
+#             respo={'respo':'Data deleted successfully'} 
+#             jsonrespo=json.dumps(respo)
+#             return HttpResponse(jsonrespo, content_type='application/json')
+#         respo={'respo':'Plz provide id'}                         
+#         jsonrespo=json.dumps(respo)
+#         return HttpResponse(jsonrespo, content_type='application/json')
+
+#-----------------------------------------------------------------------------------------------------------------------------
+
+## Class Based View
+
+# from django.utils.decorators import method_decorator
+# from django.views import View
+
+# @method_decorator(csrf_exempt, name='dispatch')
+# class Employee_details(View):
+#     def get (self, request, *args, **kwargs):
+#         jsondata=request.body
+#         stream=io.BytesIO(jsondata)
+#         parseddata=JSONParser().parse(stream)
+#         id=parseddata.get('id', None)
+#         if id is not None:
+#             print('ID =',id)
+#             emp=Employee.objects.get(id=id)
+#             serializer=EmployeeSerializer(emp)
+#             print(serializer.data)
+#             # jsondata=JSONRenderer().render(serializer.data)
+#             # OR
+#             jsondata=json.dumps(serializer.data)
+#             return HttpResponse(jsondata, content_type='application/json')
+
+#         emp=Employee.objects.all()
+#         serializer=EmployeeSerializer(emp, many=True)
+#         jsondata=JSONRenderer().render(serializer.data)
+#         return HttpResponse(jsondata, content_type='application/json')
+
+#     def post (self, request, *args, **kwargs):
+#         jsondata=request.body
+#         stream=io.BytesIO(jsondata)
+#         parseddata=JSONParser().parse(stream)
+#         serializer=EmployeeSerializer(data=parseddata)
+#         if serializer.is_valid():
+#             serializer.save()
+#             respo={'res':'Data created sccessfully'}
+#             jsonrespo=json.dumps(respo)
+#             return HttpResponse(jsonrespo, content_type='application/json')
+#         jsonrespo=json.dumps(serializer.errors)
+#         return HttpResponse(jsonrespo, content_type='application/json')
+
+#     def put (self, request, *args, **kwargs):
+#         jsondata=request.body
+#         stream=io.BytesIO(jsondata)
+#         parseddata=JSONParser().parse(stream)
+#         id=parseddata.get('id', None)
+#         emp=Employee.objects.get(id=id)
+#         serializer=EmployeeSerializer(emp, data=parseddata)
+#         if serializer.is_valid():
+#             serializer.save()
+#             respo={'res':'Complete data updated sccessfully'}
+#             jsonrespo=json.dumps(respo)
+#             return HttpResponse(jsonrespo, content_type='application/json')
+#         jsonrespo=json.dumps(serializer.errors)
+#         return HttpResponse(jsonrespo, content_type='application/json')
+
+
+#     def patch (self, request, *args, **kwargs):
+#         jsondata=request.body
+#         stream=io.BytesIO(jsondata)
+#         parseddata=JSONParser().parse(stream)
+#         id=parseddata.get('id', None)
+#         emp=Employee.objects.get(id=id)
+#         serializer=EmployeeSerializer(emp, data=parseddata, partial=True)
+#         if serializer.is_valid():
+#             serializer.save()
+#             respo={'res':'partial data updated sccessfully'}
+#             jsonrespo=json.dumps(respo)
+#             return HttpResponse(jsonrespo, content_type='application/json')
+#         jsonrespo=json.dumps(serializer.errors)
+#         return HttpResponse(jsonrespo, content_type='application/json')
+
+        
+#     def delete (self, request, *args, **kwargs):
+#         jsondata=request.body
+#         stream=io.BytesIO(jsondata)
+#         parseddata=JSONParser().parse(stream)
+#         id=parseddata.get('id', None)
+
+#         if id is not None:
+#             stu=Employee.objects.get(id=id)
+#             stu.delete()
+#             respo={'respo':'Data deleted successfully'} 
+#             jsonrespo=json.dumps(respo)
+#             return HttpResponse(jsonrespo, content_type='application/json')
+#         respo={'respo':'Plz provide id'}                         
+#         jsonrespo=json.dumps(respo)
+#         return HttpResponse(jsonrespo, content_type='application/json')
+
+#-----------------------------------------------------------------------------------------------------------------------------
+    
+## Function Based APIView (this view can provide browsable api)
+
+# from rest_framework.decorators import api_view
+# from rest_framework import status
+
+# @api_view(['GET','POST','PUT','PATCH','DELETE'])
+# def employee(request, pk=None):
+#     if request.method=='GET':
+#         emp=Employee.objects.all()
+#         serializer=EmployeeSerializer(emp,many=True)
+#         return Response(serializer.data)
+
+#     if request.method=='POST':
+#         serializer=EmployeeSerializer(data=request.data)
+#         if serializer.is_valid():
+#             serializer.save()
+#             respo={'resp':'Data saved succesffuly'}
+#             return Response(respo, content_type='application/json')
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+#     if request.method=='PUT':
+#         id=request.data.get('id', None)
+#         emp=Employee.objects.get(id=id)
+#         serializer=EmployeeSerializer(emp, data=request.data)
+#         if serializer.is_valid():
+#             serializer.save()
+#             respo={'res':'Complete data updated sccessfully'}
+#             return Response(respo, content_type='application/json')
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+#     if request.method=='PATCH':
+#         id=request.data.get('id', None)
+#         emp=Employee.objects.get(id=id)
+#         serializer=EmployeeSerializer(emp, data=request.data, partial=True)
+#         if serializer.is_valid():
+#             serializer.save()
+#             respo={'res':'Parial data updated sccessfully'}
+#             return Response(respo, content_type='application/json')
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+#     if request.method=='DELETE':
+#         id=request.data.get('id', pk)
+#         emp=Employee.objects.get(id=id)
+#         if id is not None:
+#             stu=Employee.objects.get(id=id)
+#             stu.delete()
+#             respo={'respo':'Data deleted successfully'} 
+#             jsonrespo=json.dumps(respo)
+#             return HttpResponse(jsonrespo, content_type='application/json')
+#         respo={'respo':'Plz provide id'}                         
+#         jsonrespo=json.dumps(respo)
+#         return HttpResponse(jsonrespo, content_type='application/json')
+
+#-----------------------------------------------------------------------------------------------------------------------------
+
+## Class Based APIView
+
+# from rest_framework.views import APIView 
+# from rest_framework import status
+
+# class EmployeeAPI(APIView): 
+#     def get(self, request, format=None):
+#         emp=Employee.objects.all()
+#         serializer=EmployeeSerializer(emp,many=True)
+#         return Response(serializer.data)
+
+#     def post(self, request, format=None):
+#         serializer=EmployeeSerializer(data=request.data)
+#         if serializer.is_valid():
+#             serializer.save()
+#             respo={'resp':'Data saved succesffuly'}
+#             return Response(respo, content_type='application/json')
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+#     def put(self, request, format=None):
+#         id=request.data.get('id', None)
+#         emp=Employee.objects.get(id=id)
+#         serializer=EmployeeSerializer(emp, data=request.data)
+#         if serializer.is_valid():
+#             serializer.save()
+#             respo={'res':'Complete data updated sccessfully'}
+#             return Response(respo, content_type='application/json')
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+#     def patch(self, request, format=None):
+#         id=request.data.get('id', None)
+#         emp=Employee.objects.get(id=id)
+#         serializer=EmployeeSerializer(emp, data=request.data, partial=True)
+#         if serializer.is_valid():
+#             serializer.save()
+#             respo={'res':'Parial data updated sccessfully'}
+#             return Response(respo, content_type='application/json')
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+#     def delete(self, request, format=None):
+#         id=request.data.get('id', None)
+#         emp=Employee.objects.get(id=id)
+#         if id is not None:
+#             stu=Employee.objects.get(id=id)
+#             stu.delete()
+#             respo={'respo':'Data deleted successfully'} 
+#             jsonrespo=json.dumps(respo)
+#             return HttpResponse(jsonrespo, content_type='application/json')
+#         respo={'respo':'Plz provide id'}                         
+#         jsonrespo=json.dumps(respo)
+#         return HttpResponse(jsonrespo, content_type='application/json')
+
+#-----------------------------------------------------------------------------------------------------------------------------
+
+## Generic API View
+
+# from rest_framework.generics import GenericAPIView, UpdateAPIView
+# from rest_framework.mixins import ListModelMixin, CreateModelMixin, UpdateModelMixin, RetrieveModelMixin, DestroyModelMixin
+
+# class EmployeeLC(GenericAPIView, ListModelMixin,CreateModelMixin):
+#     queryset=Employee.objects.all()
+#     serializer_class=EmployeeSerializer
+
+#     def get(self, request, *args, **kwargs):
+#         return self.list(request, *args, **kwargs)
+
+#     def post(self, request, *args, **kwargs):
+#         return self.create(request, *args, **kwargs)
+
+
+# class EmployeeRUD(GenericAPIView, RetrieveModelMixin, UpdateModelMixin, DestroyModelMixin):
+#     queryset=Employee.objects.all()
+#     serializer_class=EmployeeSerializer
+
+#     def get(self, request, *args, **kwargs):
+#         return self.retrieve(request, *args, **kwargs)
+
+
+#     def put(self, request, *args, **kwargs):
+#         return self.update(request, *args, **kwargs)
+
+
+#     def delete(self, request, *args, **kwargs):
+#         return self.destroy(request, *args, **kwargs)
+
+#-----------------------------------------------------------------------------------------------------------------------------
+
+## Concrete Generic View
+
+from rest_framework.generics import ListAPIView, CreateAPIView, RetrieveAPIView, UpdateAPIView, DestroyAPIView, ListCreateAPIView, RetrieveUpdateDestroyAPIView
+
+# Seperate class for individual action
+# class EmployeeList(ListAPIView):
+#     queryset=Employee.objects.all()
+#     serializer_class=EmployeeSerializer
+
+# class EmployeeCreate(CreateAPIView):
+#     queryset=Employee.objects.all()
+#     serializer_class=EmployeeSerializer
+
+# class EmployeeRetrieve(RetrieveAPIView):
+#     queryset=Employee.objects.all()
+#     serializer_class=EmployeeSerializer
+
+# class EmployeeUpdate(UpdateAPIView):
+#     queryset=Employee.objects.all()
+#     serializer_class=EmployeeSerializer
+
+# class EmployeeDelete(DestroyAPIView):
+#     queryset=Employee.objects.all()
+#     serializer_class=EmployeeSerializer
+
+
+## Comibned APIView for CRUD
+
+# class EmployeeListCreate(ListCreateAPIView):
+#     queryset=Employee.objects.all()
+#     serializer_class=EmployeeSerializer
+
+# class EmployeeRetrieveUpdateDestroy(RetrieveUpdateDestroyAPIView):
+#     queryset=Employee.objects.all()
+#     serializer_class=EmployeeSerializer
+
+#-----------------------------------------------------------------------------------------------------------------------------
+
+
+### ViewSets
+
+# from rest_framework import viewsets
+# from rest_framework import status
+
+# class EmployeeViewSets(viewsets.ViewSet):
+#     def list(self, request):
+#         emp=Employee.objects.all()
+#         serializer=EmployeeSerializer(emp,many=True)
+#         return Response(serializer.data)
+
+#     def create(self, request):
+#         serializer=EmployeeSerializer(data=request.data)
+#         if serializer.is_valid():
+#             serializer.save()
+#             respo={'respo':'Data crated successfully'}
+#             return Response(respo, status=status.HTTP_201_CREATED)
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+#     def retrieve(self, request, pk=None):
+#         id=pk
+#         print('ID=',id)
+#         if id is not None:
+#             emp=Employee.objects.get(id=id)
+#             print('emp=',emp)
+#             serializer=EmployeeSerializer(emp)
+#             return Response(serializer.data)
+
+#     def update(self, request, pk):
+#         id=pk        
+#         emp=Employee.objects.get(id=id)
+#         serializer=EmployeeSerializer(emp, data=request.data)
+#         if serializer.is_valid():
+#             serializer.save()
+#             respo={'respo':'Complete data updated successfully'}
+#             return Response(respo, status=status.HTTP_201_CREATED)
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+#     def partial_update(self, request, pk):
+#         id=pk        
+#         emp=Employee.objects.get(id=id)
+#         serializer=EmployeeSerializer(emp, data=request.data, partial=True)
+#         if serializer.is_valid():
+#             serializer.save()
+#             respo={'respo':'Partial data updated successfully'}
+#             return Response(respo, status=status.HTTP_201_CREATED)
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+#     def destroy(self, request, pk):
+#         id=pk        
+#         emp=Employee.objects.get(id=id)
+#         emp.delete()
+#         respo={'respo':'Data deleted successfully'}
+#         return Response(respo, status=status.HTTP_204_NO_CONTENT)
+
+
+
+
+## Model View Set
+
+'''
+from rest_framework import viewsets
+from rest_framework.authentication import BasicAuthentication, SessionAuthentication
+from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser, IsAuthenticatedOrReadOnly, DjangoModelPermissionsOrAnonReadOnly, DjangoModelPermissions
+
+class EmployeeModelViewSet(viewsets.ModelViewSet):
+    queryset=Employee.objects.all()
+    serializer_class=EmployeeSerializer
+    #authenticaton_classes=[BasicAuthentication]
+    authenticaton_classes=[SessionAuthentication]
+    
+    #permission_classes=[IsAuthenticatedOrReadOnly]
+    permission_classes=[DjangoModelPermissions]
+    #permission_classes=[DjangoModelPermissionsOrAnonReadOnly]
+'''
+
+from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser, IsAuthenticatedOrReadOnly, DjangoModelPermissionsOrAnonReadOnly, DjangoModelPermissions
+
+## Read Only Model View Set
+
+#class EmployeeROMVS(viewsets.ReadOnlyModelViewSet):
+#    queryset=Employee.objects.all()
+#    serializer_class=EmployeeSerializer
+
+
+
+import requests
+
+def home_geoip(request):
+    ip_address = request.META.get('HTTP_X_FORWARDED_FOR', '')
+    print('ssssssssssssssss',ip_address)
+    response=requests.get('http://freegeoip.net/json/')
+    geodata=response.json()
+    #print(geodata)
+    return render(request, 'geoip.html', {
+        'ip': geodata['ip'],
+        'country': geodata['country_name']
+    })
+
+def github(request):
+    user = {}
+    if 'username' in request.GET:
+        username = request.GET['username']
+        #username = 'pratikbansod'
+        url = 'https://api.github.com/users/%s' % username
+        response = requests.get(url)
+        user = response.json()
+    return render(request, 'github.html', {'user': user})
+
+
+from P8_Generic_api_view import settings
+
+def odapi(request):
+    """ OXFORD DICTIONARY API CALL"""
+    import  requests
+    import json
+    
+
+    app_id = settings.OXFORD_APP_ID
+    app_key = settings.OXFORD_APP_KEY
+    language = 'en-gb'
+    word_id = 'Ace'
+
+    url = 'https://od-api.oxforddictionaries.com/api/v2/entries/'  + language + '/'  + word_id.lower()
+    r = requests.get(url, headers = {'app_id' : app_id, 'app_key' : app_key})
+    
+    
+    print("code {}\n".format(r.status_code))
+    print("text \n" + r.text)
+    print("json \n" + json.dumps(r.json()))
+
+
+from rest_framework.decorators import api_view
+from rest_framework import status
+
+@api_view(['GET','POST','PUT','PATCH','DELETE'])
+def employee(request, pk=None):
+    if request.method=='GET':
+        emp=Employee.objects.all()
+        serializer=EmployeeSerializer(emp,many=True)
+        return Response(serializer.data)
+
+from .serializers import EmpDetailsSerializer
+
+# API for getting EmpDeatais and its employee
+@api_view(['GET','POST','PUT','PATCH','DELETE'])
+def empdetails(request, pk=None):
+    if request.method=='GET':
+        emp=empdetails.objects.all()
+        serializer=EmpDetailsSerializer(emp,many=True)
+        return Response(serializer.data)
